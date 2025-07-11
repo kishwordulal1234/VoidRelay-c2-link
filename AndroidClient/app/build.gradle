@@ -1,0 +1,56 @@
+plugins {
+    id &apos;com.android.application&apos;
+    id &apos;org.jetbrains.kotlin.android&apos; <!-- Keep Kotlin plugin for potential future use or if project template includes it -->
+}
+
+android {
+    namespace &apos;com.example.crossc2&apos;
+    compileSdk 34 <!-- Use a recent compile SDK version -->
+
+    defaultConfig {
+        applicationId "com.example.crossc2"
+        minSdk 21 <!-- Set minimum SDK based on desired compatibility -->
+        targetSdk 34 <!-- Target a recent SDK version -->
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile(&apos;proguard-android-optimize.txt&apos;), &apos;proguard-rules.pro&apos;
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = &apos;1.8&apos;
+    }
+}
+
+dependencies {
+
+    implementation &apos;androidx.core:core-ktx:1.10.1&apos; <!-- Use recent versions -->
+    implementation &apos;androidx.appcompat:appcompat:1.6.1&apos;
+    implementation &apos;com.google.android.material:material:1.9.0&apos;
+    implementation &apos;androidx.constraintlayout:constraintlayout:2.1.4&apos;
+
+    <!-- OkHttp and OkHttp-Logging-Interceptor -->
+    implementation &apos;com.squareup.okhttp3:okhttp:4.11.0&apos;
+    implementation &apos;com.squareup.okhttp3:logging-interceptor:4.11.0&apos;
+
+    <!-- Gson for JSON parsing -->
+    implementation &apos;com.google.code.gson:gson:2.10.1&apos;
+
+    <!-- Base64 (Android SDK provides android.util.Base64, but this is an alternative) -->
+    <!-- implementation &apos;commons-codec:commons-codec:1.15&apos; --> <!-- Android SDK Base64 is sufficient -->
+
+
+    testImplementation &apos;junit:junit:4.13.2&apos;
+    androidTestImplementation &apos;androidx.test.ext:junit:1.1.5&apos;
+    androidTestImplementation &apos;androidx.test.espresso:espresso-core:3.5.1&apos;
+}

